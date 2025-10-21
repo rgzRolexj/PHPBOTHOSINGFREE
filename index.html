@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGZ ROLEX - Animated Bot Host</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden; 
+        }
+
+        /* Interactive Particle Background Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 550px;
+            perspective: 1500px; /* 3D effect ke liye */
+        }
+        
+        /* Glassmorphism Card Style */
+        .card {
+            background: rgba(20, 20, 35, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 40px 35px;
+            text-align: center;
+            transition: transform 0.1s linear;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        /* Entry Animation for Card */
+        .card {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            animation: fadeInCard 0.8s 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        @keyframes fadeInCard {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Animated Glowing Border */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 20px;
+            background: conic-gradient(#6a11cb, #2575fc, #6a11cb, transparent, transparent);
+            animation: rotateGlow 4s linear infinite;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Staggered Entry Animation for child elements */
+        .card > * {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        .header { animation-delay: 0.4s; }
+        .upload-form .input-group { animation-delay: 0.5s; }
+        .upload-form .file-input-container { animation-delay: 0.6s; }
+        .upload-form .upload-btn { animation-delay: 0.7s; }
+        .features-section { animation-delay: 0.8s; }
+        .footer { animation-delay: 0.9s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Logo Styles */
+        .logo-icon {
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(106, 27, 154, 0.8), 0 0 25px rgba(37, 117, 252, 0.8);
+            animation: bobbing 3s infinite ease-in-out;
+            transform-origin: bottom center;
+        }
+
+        @keyframes bobbing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Header Styles */
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin: 15px 0 10px;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            color: #bdc3c7;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+        
+        /* Form Styles for better spacing */
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .input-group {
+            text-align: left;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #bdc3c7;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #fff;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group input[type="text"]:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 20px rgba(106, 27, 154, 0.6);
+        }
+        
+        /* File Upload Area Styles */
+        .file-input-wrapper {
+            cursor: pointer;
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            border: 2px dashed transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: rgba(37, 117, 252, 0.5);
+            background-color: rgba(37, 117, 252, 0.05);
+        }
+
+        .file-input-wrapper.dragover {
+             border-color: #2575fc;
+             background-color: rgba(37, 117, 252, 0.1);
+             transform: scale(1.02);
+        }
+
+        .file-select-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #4c1d95, #1e40af);
+            color: white;
+            padding: 14px 25px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .file-input-wrapper:hover .file-select-button {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(106, 27, 154, 0.5);
+        }
+        
+        .drag-drop-text {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+        
+        /* Magnetic Button Styles */
+        .upload-btn {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            will-change: transform;
+            margin-top: 10px;
+        }
+
+        .upload-btn:hover {
+            box-shadow: 0 10px 30px rgba(106, 27, 154, 0.6);
+        }
+
+        .upload-btn .btn-text {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+        
+        /* Click Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* --- UPDATED FEATURES SECTION STYLES --- */
+        .features-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px; /* Reduced gap */
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+        }
+
+        .feature-item {
+            flex: 1;
+            padding: 15px 10px; /* Reduced padding */
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 1.7rem; /* Reduced icon size */
+            color: #2575fc;
+            margin-bottom: 10px; /* Reduced margin */
+            text-shadow: 0 0 10px #2575fc;
+        }
+
+        .feature-item h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem; /* Reduced heading size */
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .feature-item p {
+            font-size: 0.8rem; /* Reduced paragraph size */
+            color: #bdc3c7;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="main-container">
+        <div class="card" id="main-card">
+            <div class="logo">
+                <i class="fas fa-robot logo-icon"></i>
+            </div>
+            
+            <div class="header">
+                <h1>RGZ ROLEX PHP Bot Host</h1>
+                <p>Ek futuristic platform aapke bot ke liye</p>
+            </div>
+            
+            <form class="upload-form" action="upload.php" method="POST" enctype="multipart/form-data">
+                <div class="input-group">
+                    <label for="botname-input" class="input-label">1. Apne Bot Ka Naam Likhein</label>
+                    <input id="botname-input" type="text" name="botname" placeholder="Jaise: MyAwesomeBot" required>
+                </div>
+
+                <div class="file-input-container input-group">
+                     <label class="input-label">2. Bot Ki File Upload Karein</label>
+                    <label for="botfile-input" class="file-input-wrapper">
+                        <span class="file-select-button">
+                            <i class="fas fa-paperclip"></i> File Chunein
+                        </span>
+                        <span class="drag-drop-text">ya file ko yahan drag karke drop karein</span>
+                    </label>
+                    <input id="botfile-input" type="file" name="botfile" accept=".php" required style="display:none;">
+                    <div id="fileNameDisplay" style="text-align: center; margin-top:10px; color: #2575fc;"></div>
+                </div>
+                
+                <button type="submit" class="upload-btn">
+                    <span class="btn-text"><i class="fas fa-rocket"></i> Bot Ko Launch Karein</span>
+                </button>
+            </form>
+
+            <div class="features-section">
+                <div class="feature-item">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h3>Secure Hosting</h3>
+                    <p>Aapke bot ke liye sabse surakshit environment.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-bolt feature-icon"></i>
+                    <h3>Fast Processing</h3>
+                    <p>Tez-raftaar execution taaki koi delay na ho.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-server feature-icon"></i>
+                    <h3>24/7 Uptime</h3>
+                    <p>Aapka bot hamesha online aur active rahega.</p>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="footer">
+            <p>Created with <i class="fas fa-heart" style="color: #ff375f;"></i> by RGZ ROLEX</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Particle Background Effect ---
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particlesArray;
+
+            const mouse = {
+                x: null,
+                y: null,
+                radius: (canvas.height / 120) * (canvas.width / 120)
+            };
+
+            window.addEventListener('mousemove', function(event) {
+                mouse.x = event.x;
+                mouse.y = event.y;
+            });
+
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+                update() {
+                    if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
+                    if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
+
+            function initParticles() {
+                particlesArray = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * .4) - .2;
+                    let directionY = (Math.random() * .4) - .2;
+                    let color = 'rgba(106, 27, 154, 0.5)';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+
+            function connectParticles() {
+                let opacityValue = 1;
+                for (let a = 0; a < particlesArray.length; a++) {
+                    for (let b = a; b < particlesArray.length; b++) {
+                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                     ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                        if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                            opacityValue = 1 - (distance / 20000);
+                            let dx = mouse.x - particlesArray[a].x;
+                            let dy = mouse.y - particlesArray[a].y;
+                            let mouseDistance = Math.sqrt(dx*dx + dy*dy);
+                            if(mouseDistance < mouse.radius){
+                                ctx.strokeStyle = `rgba(37, 117, 252, ${opacityValue})`;
+                            } else {
+                                ctx.strokeStyle = `rgba(106, 27, 154, ${opacityValue})`;
+                            }
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animateParticles() {
+                requestAnimationFrame(animateParticles);
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+                connectParticles();
+            }
+            
+            window.addEventListener('resize', function(){
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+                mouse.radius = (canvas.height / 120) * (canvas.width / 120);
+                initParticles();
+            });
+
+            window.addEventListener('mouseout', function(){
+                mouse.x = undefined;
+                mouse.y = undefined;
+            });
+            
+            initParticles();
+            animateParticles();
+
+            // --- 3D Card Tilt Effect ---
+            const card = document.getElementById('main-card');
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = card.offsetWidth / 2;
+                const centerY = card.offsetHeight / 2;
+                const rotateX = ((y - centerY) / centerY) * -8;
+                const rotateY = ((x - centerX) / centerX) * 8;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            });
+
+            // --- Magnetic Button Effect ---
+            const button = document.querySelector('.upload-btn');
+            const btnText = button.querySelector('.btn-text');
+            button.addEventListener('mousemove', (e) => {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                button.style.transform = `translate(${x * 0.2}px, ${y * 0.3}px)`;
+                btnText.style.transform = `translate(${x * 0.1}px, ${y * 0.2}px)`;
+            });
+
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translate(0, 0)';
+                btnText.style.transform = 'translate(0, 0)';
+            });
+
+            // --- Button Ripple Effect ---
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                this.appendChild(ripple);
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+            
+            // --- File Input Logic ---
+            const fileInput = document.getElementById('botfile-input');
+            const fileSelectButton = document.querySelector('.file-select-button');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const fileWrapper = document.querySelector('.file-input-wrapper');
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    fileSelectButton.innerHTML = `<i class="fas fa-check"></i> File Chuni Gayi!`;
+                    fileNameDisplay.textContent = `${fileInput.files[0].name}`;
+                } else {
+                    fileSelectButton.innerHTML = `<i class="fas fa-paperclip"></i> File Chunein`;
+                    fileNameDisplay.textContent = '';
+                }
+            });
+
+            // --- Drag & Drop file effect ---
+             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileWrapper.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileWrapper.addEventListener(eventName, () => fileWrapper.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileWrapper.addEventListener(eventName, () => fileWrapper.classList.remove('dragover'), false);
+            });
+
+            fileWrapper.addEventListener('drop', (e) => {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }, false);
+
+        });
+    </script>
+</body>
+</html>
+
+
